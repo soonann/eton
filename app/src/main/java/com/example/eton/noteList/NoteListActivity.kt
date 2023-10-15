@@ -7,17 +7,26 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.eton.R
 import com.example.eton.noteDetail.NoteDetailActivity
 import com.example.eton.supabase.Note
 import com.example.eton.supabase.Supabase
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.coroutines.launch
 
 class NoteListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
+        setContentView(R.layout.activity_note_list)
+
+        // refresh
+        val pullToRefresh = findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+        pullToRefresh.setOnRefreshListener {
+            fetchNotes() // your code
+            pullToRefresh.isRefreshing = false
+        }
 
         // set layout manager of recycler view
         val manager = LinearLayoutManager(this)
@@ -51,20 +60,13 @@ class NoteListActivity : AppCompatActivity() {
     private fun fetchNotes (){
         lifecycleScope.launch {
             val client = Supabase().getClient()
-            val res = client.postgrest["notes"].select()
+            val res = client.postgrest["notes"].select(){
+                order(column = "note_title", order = Order.ASCENDING)
+            }
             val data =  res.decodeList<Note>()
             setAdapterData(data)
 
         }
-    }
-
-    // TODO: CRUD from supabase
-    private fun getMockData(): ArrayList<Note> {
-        return arrayListOf<Note>(
-            Note("Groceries"),
-            Note("Shopping List"),
-            Note("School"),
-        )
     }
 
 }

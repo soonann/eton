@@ -49,6 +49,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/ssp_black"
             android:text="Login"
+            android:onClick="onLogin"
             android:layout_weight="2"/>
         <Space
             android:layout_width="0dp"
@@ -62,6 +63,16 @@
             android:fontFamily="@font/ssp_black"
             android:text="Sign up"
             android:layout_weight="2"/>
+
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btnLoginWithGoogle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="15sp"
+        android:text="Login with Google"
+        android:onClick="onLoginWithGoogle"
+        />
 
 </LinearLayout>

@@ -5,6 +5,8 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
 import androidx.lifecycle.lifecycleScope
+import io.github.jan.supabase.gotrue.FlowType
+import io.github.jan.supabase.gotrue.GoTrue
 import kotlinx.coroutines.launch
 
 class Supabase {

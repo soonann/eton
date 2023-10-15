@@ -7,11 +7,31 @@
     android:orientation="vertical"
     tools:context=".noteDetail.NoteDetailActivity">
 
-    <TextView
-        android:id="@+id/noteDetailTitle"
+    <Button
+        android:id="@+id/btnSave"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="30sp"
-        android:text="Title"
+        android:text="Save"
+        android:onClick="onSave"
         />
+
+    <EditText
+        android:id="@+id/editTextTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:textSize="30sp"
+        android:layout_marginHorizontal="10sp"
+        android:inputType="text"
+        android:text="Title" />
+
+    <EditText
+        android:id="@+id/editTextBody"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:ems="10"
+        android:layout_marginHorizontal="10sp"
+        android:gravity="start|top"
+        android:inputType="textMultiLine" />
+
 </LinearLayout>

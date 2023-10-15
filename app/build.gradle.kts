@@ -67,8 +67,10 @@ dependencies {
 
     // supabase
     implementation("io.github.jan-tennert.supabase:postgrest-kt:1.4.1")
+    // implementation("io.github.jan-tennert.supabase:gotrue-kt:1.4.1")
     implementation("io.ktor:ktor-client-cio:2.3.3")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

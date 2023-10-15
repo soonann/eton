@@ -1,5 +1,6 @@
 package com.example.eton.noteList
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -7,6 +8,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.eton.R
+import com.example.eton.noteDetail.NoteDetailActivity
 
 class NoteListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +32,11 @@ class NoteListActivity : AppCompatActivity() {
         // create adapter and bind to recycler view
         var noteAdapter = NoteAdapter(
             data,
-        ) { note -> Log.d("",note.title) };
+        ) { note ->
+            val intent = Intent(this, NoteDetailActivity::class.java)
+            intent.putExtra("title", note.title)
+            startActivity(intent)
+        };
         rv.adapter = noteAdapter
     }
 

@@ -1,6 +1,9 @@
 package com.example.eton.noteList
 
 class Note (
-    val title: String
 ){
+    var title: String = ""
+    constructor(title: String) : this() {
+        this.title = title
+    }
 }

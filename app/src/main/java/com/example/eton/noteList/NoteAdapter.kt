@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.eton.R
+import com.example.eton.supabase.Note
 
 class NoteAdapter(
     private val dataSet: List<Note>,
@@ -48,7 +49,7 @@ class NoteAdapter(
         //  bind the data and onClick on to the item
         fun bind(note: Note){
             currentNote = note
-            textView.text = note.title
+            textView.text = note.note_title
         }
     }
 }

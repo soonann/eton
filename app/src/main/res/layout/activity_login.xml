@@ -38,11 +38,11 @@
 
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="30dp"
-        android:layout_marginRight="10dp">
+        android:layout_margin="20dp">
         <Button
             android:id="@+id/loginBtn"
             android:layout_width="0dp"
@@ -66,13 +66,13 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/btnLoginWithGoogle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="15sp"
-        android:text="Login with Google"
-        android:onClick="onLoginWithGoogle"
-        />
+<!--    <Button-->
+<!--        android:id="@+id/btnLoginWithGoogle"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginHorizontal="15sp"-->
+<!--        android:text="Login with Google"-->
+<!--        android:onClick="onLoginWithGoogle"-->
+<!--        />-->
 
 </LinearLayout>

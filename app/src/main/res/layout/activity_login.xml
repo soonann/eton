@@ -16,14 +16,14 @@
         android:fontFamily="@font/ssp_bold"/>
 
     <EditText
-        android:id="@+id/usernameText"
+        android:id="@+id/emailText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:inputType="text"
+        android:inputType="textEmailAddress"
         android:gravity="center"
         android:fontFamily="@font/ssp_regular"
-        android:hint="username" />
+        android:hint="email" />
 
 
     <EditText

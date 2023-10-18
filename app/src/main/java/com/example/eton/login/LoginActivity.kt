@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.eton.R
 import com.example.eton.noteList.NoteListActivity
@@ -28,31 +29,54 @@ class LoginActivity : AppCompatActivity() {
 
     // onLogin button clicked
     fun onLogin (view: View){
-        val username: TextView = findViewById(R.id.usernameText)
+        val emailText: TextView = findViewById(R.id.emailText)
         val pass: TextView = findViewById(R.id.passwordText)
+        var msg: String        // display toast message
+        var auth = false    // check if authenticated
 
+        // for async call to authenticate
         runBlocking {
-            client.gotrue.loginWith(Email) {
-                email = username.text.toString()
-                password = pass.text.toString()
+            try {
+                client.gotrue.loginWith(Email) {
+                    email = emailText.text.toString()
+                    password = pass.text.toString()
+                }
+
+                msg = "User ${emailText.text} success!"
+                auth = true
+            } catch (e: Exception) {
+                Log.e("Error", e.toString())
+                msg = e.localizedMessage.toString().split("\n")[0] // dk if there's a better way to do this LOL
+                auth = false
             }
         }
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
 
-        val intent = Intent(this, NoteListActivity::class.java)
-        startActivity(intent)
+        // login and start new activity when authenticated
+        if (auth) {
+            val intent = Intent(this, NoteListActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     fun onSignUp(view: View) {
-        val username: TextView = findViewById(R.id.usernameText)
+        val emailText: TextView = findViewById(R.id.emailText)
         val pass: TextView = findViewById(R.id.passwordText)
+        var msg: String
 
         runBlocking {
-            val user = client.gotrue.signUpWith(Email) {
-                email = username.text.toString()
-                password = pass.text.toString()
+            try {
+                val user = client.gotrue.signUpWith(Email) {
+                    email = emailText.text.toString()
+                    password = pass.text.toString()
+                }
+                msg = "User ${emailText.text} sign up success!"
+            } catch (e: Exception) {
+                msg = e.localizedMessage.toString().split("\n")[0] // dk if there's a better way to do this LOL
+                Log.e("Error", e.toString())
             }
-            Log.i("signup", user.toString())
         }
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
     // onLogin with Google

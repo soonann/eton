@@ -62,6 +62,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/ssp_black"
             android:text="Sign up"
+            android:onClick="onSignUp"
             android:layout_weight="2"/>
 
     </LinearLayout>

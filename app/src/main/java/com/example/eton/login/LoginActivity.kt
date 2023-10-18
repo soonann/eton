@@ -78,11 +78,4 @@ class LoginActivity : AppCompatActivity() {
         }
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
-
-    // onLogin with Google
-    fun onLoginWithGoogle(view: View){
-       // lifecycleScope.launch {
-       //     client.gotrue.loginWith(Google)
-       // }
-    }
 }

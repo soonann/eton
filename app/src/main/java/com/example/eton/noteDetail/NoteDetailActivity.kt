@@ -41,8 +41,8 @@ class NoteDetailActivity : AppCompatActivity() {
         note = intentNote!!
 
         // populate the data
-        val etTitle: EditText = findViewById<EditText>(R.id.editTextTitle)
-        val etBody: EditText = findViewById<EditText>(R.id.editTextBody)
+        val etTitle: EditText = findViewById(R.id.editTextTitle)
+        val etBody: EditText = findViewById(R.id.editTextBody)
 
         // set the title and text
         etTitle.setText(note.note_title)
@@ -60,10 +60,11 @@ class NoteDetailActivity : AppCompatActivity() {
 
     }
 
+    // TODO: fix the save button as it is quite buggy, doesn't update the db.
     fun onSave(view: View){
         // populate the data
-        val etTitle: EditText = findViewById<EditText>(R.id.editTextTitle)
-        val etBody: EditText = findViewById<EditText>(R.id.editTextBody)
+        val etTitle: EditText = findViewById(R.id.editTextTitle)
+        val etBody: EditText = findViewById(R.id.editTextBody)
         lifecycleScope.launch {
             client.postgrest["notes"].update ({
                 set("note_title", etTitle.text.toString() )
@@ -73,6 +74,10 @@ class NoteDetailActivity : AppCompatActivity() {
             }
         }
     }
+
+    /**
+     * Take video and return as an image
+     */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == cameraRequest) {

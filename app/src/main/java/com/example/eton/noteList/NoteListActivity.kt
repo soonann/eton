@@ -65,9 +65,7 @@ class NoteListActivity : AppCompatActivity() {
                 order(column = "note_title", order = Order.ASCENDING)
             }
             val data =  res.decodeList<Note>()
-            Log.i("data", data.toString())
             setAdapterData(data)
-
         }
     }
 

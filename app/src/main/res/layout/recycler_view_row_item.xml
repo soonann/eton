@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="25sp"
-        android:fontFamily="@font/ssp_bold"
+        android:text="hello"
+        android:fontFamily="@font/ssp_semibold"
         />
 
 </FrameLayout>

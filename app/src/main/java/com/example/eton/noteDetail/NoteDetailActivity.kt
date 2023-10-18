@@ -34,7 +34,7 @@ class NoteDetailActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_note_detail2)
+        setContentView(R.layout.activity_note_detail)
 
         // get the intent seralized data
         val intentNote = intent.getSerializableExtra("note") as Note?

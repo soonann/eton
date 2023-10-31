@@ -8,11 +8,13 @@ import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -30,7 +32,7 @@ class NoteDetailActivity : AppCompatActivity() {
     lateinit var note: Note
 
     private val cameraRequest = 1888
-    lateinit var imageView: ImageView
+    private lateinit var imageView: ImageView
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,23 +62,34 @@ class NoteDetailActivity : AppCompatActivity() {
 
     }
 
-    // TODO: fix the save button as it is quite buggy, doesn't update the db.
     fun onSave(view: View){
+        var saved = false
         // populate the data
         val etTitle: EditText = findViewById(R.id.editTextTitle)
         val etBody: EditText = findViewById(R.id.editTextBody)
-        lifecycleScope.launch {
-            client.postgrest["notes"].update ({
-                set("note_title", etTitle.text.toString() )
-                set("note_text", etBody.text.toString() )
-            }){
-                eq("id", note.id)
+        try {
+            lifecycleScope.launch {
+                client.postgrest["notes"].update ({
+                    set("note_title", etTitle.text.toString() )
+                    set("note_text", etBody.text.toString() )
+                }){
+                    eq("id", note.id)
+                }
             }
+            saved = true
+        } catch (e: Exception) {
+            Log.e("Err", e.toString())
+        }
+
+        if (saved) {
+            Toast.makeText(this, "Successfully saved data!", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "Unable to save data", Toast.LENGTH_SHORT).show()
         }
     }
 
     /**
-     * Take video and return as an image
+     * Take picture and return as an image
      */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

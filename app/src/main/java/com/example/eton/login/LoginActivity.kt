@@ -7,12 +7,17 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.eton.R
 import com.example.eton.noteList.NoteListActivity
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.gotrue
 import com.example.eton.supabase.Supabase
 import io.github.jan.supabase.gotrue.providers.builtin.Email
+import io.github.jan.supabase.storage.Bucket
+import io.github.jan.supabase.storage.storage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class LoginActivity : AppCompatActivity() {
@@ -26,6 +31,7 @@ class LoginActivity : AppCompatActivity() {
 
     // onLogin button clicked
     fun onLogin (view: View){
+        val context = this
         val emailText: TextView = findViewById(R.id.emailText)
         val pass: TextView = findViewById(R.id.passwordText)
         var msg: String        // display toast message
@@ -47,12 +53,34 @@ class LoginActivity : AppCompatActivity() {
                 auth = false
             }
         }
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
 
-        // login and start new activity when authenticated
-        if (auth) {
-            val intent = Intent(this, NoteListActivity::class.java)
-            startActivity(intent)
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val bucket = client.storage.retrieveBucketById(bucketId = emailText.text.toString())!!
+            } catch (e: Exception) {
+                val msg = e.message.toString().split("\n")[0]
+                Log.e("err", e.toString())
+
+                // Create a bucket
+                // TODO: Enable RLS policy in the db so that can create bucket
+//                if (msg == "Bucket not found (Bucket not found)") {
+//                    val bucket = client.storage.createBucket(id = emailText.text.toString()) {
+//                        public = true
+//                        fileSizeLimit = 1.megabytes
+//                    }
+//                    Log.i("bucket", bucket.toString())
+//                } else {
+//                    Log.e("err", e.toString())
+//                }
+            }
+            runOnUiThread {
+                // login and start new activity when authenticated
+    //        if (auth) {
+                    val intent = Intent(context, NoteListActivity::class.java)
+                    startActivity(intent)
+    //        }
+            }
         }
     }
 

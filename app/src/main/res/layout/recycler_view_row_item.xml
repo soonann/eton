@@ -38,7 +38,7 @@
             android:id="@+id/noteImage"
             android:layout_width="100dp"
             android:layout_height="fill_parent"
-            android:src="@drawable/etonLogo"
+            android:src="@drawable/etonlogo"
             android:gravity="center|end"
             android:layout_weight="1"/>
     </LinearLayout>

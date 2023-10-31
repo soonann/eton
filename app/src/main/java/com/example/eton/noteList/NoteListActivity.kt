@@ -3,6 +3,7 @@ package com.example.eton.noteList
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +18,7 @@ import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.coroutines.launch
 
 class NoteListActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_list)
@@ -68,6 +70,11 @@ class NoteListActivity : AppCompatActivity() {
         }
     }
 
+    // Pull latest changes from the db when the NoteDetailActivity closes.
+    override fun onResume() {
+        super.onResume()
+        fetchNotes()
+    }
 }
 
 

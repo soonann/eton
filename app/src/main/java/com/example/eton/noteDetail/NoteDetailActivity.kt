@@ -10,16 +10,14 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.eton.R
+import com.example.eton.camera.CameraView
 import com.example.eton.supabase.Note
 import com.example.eton.supabase.Supabase
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -32,7 +30,7 @@ class NoteDetailActivity : AppCompatActivity() {
     lateinit var note: Note
 
     private val cameraRequest = 1888
-    private lateinit var imageView: ImageView
+//    private lateinit var imageView: ImageView
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,15 +48,15 @@ class NoteDetailActivity : AppCompatActivity() {
         etTitle.setText(note.note_title)
         etBody.setText(note.note_text)
 
-        if (ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.CAMERA)
-            == PackageManager.PERMISSION_DENIED)
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), cameraRequest)
-        imageView = findViewById(R.id.imageView)
-        val cameraBtn: FloatingActionButton = findViewById(R.id.cameraBtn)
-        cameraBtn.setOnClickListener {
-            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            startActivityForResult(cameraIntent, cameraRequest)
-        }
+//        if (ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.CAMERA)
+//            == PackageManager.PERMISSION_DENIED)
+//            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), cameraRequest)
+//        imageView = findViewById(R.id.imageView)
+//        val cameraBtn: FloatingActionButton = findViewById(R.id.cameraBtn)
+//        cameraBtn.setOnClickListener {
+//            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+//            startActivityForResult(cameraIntent, cameraRequest)
+//        }
 
     }
 
@@ -91,11 +89,17 @@ class NoteDetailActivity : AppCompatActivity() {
     /**
      * Take picture and return as an image
      */
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == cameraRequest) {
-            val photo: Bitmap = data?.extras?.get("data") as Bitmap
-            imageView.setImageBitmap(photo)
-        }
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        if (requestCode == cameraRequest) {
+//            val photo: Bitmap = data?.extras?.get("data") as Bitmap
+//            imageView.setImageBitmap(photo)
+//        }
+//    }
+
+    // Image detector
+    fun imageDetector(view: View) {
+        val intent = Intent(this, CameraView::class.java)
+        startActivity(intent)
     }
 }

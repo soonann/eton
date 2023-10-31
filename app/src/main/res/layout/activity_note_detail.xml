@@ -61,6 +61,7 @@
                 android:layout_gravity="bottom|end"
                 android:src="@drawable/camera_vector"
                 android:layout_margin="10dp"
+                android:onClick="imageDetector"
                 app:fabSize="normal"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />

@@ -3,7 +3,6 @@ package com.example.eton.noteList
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -60,7 +59,7 @@ class NoteListActivity : AppCompatActivity() {
 
     private fun fetchNotes (){
         lifecycleScope.launch {
-            val client = Supabase().getClient()
+            val client = Supabase.getClient()
             val res = client.postgrest["notes"].select(){
                 order(column = "note_title", order = Order.ASCENDING)
             }

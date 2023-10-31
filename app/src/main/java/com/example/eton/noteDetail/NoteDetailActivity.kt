@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 
 class NoteDetailActivity : AppCompatActivity() {
 
-    val client = Supabase().getClient()
+    val client = Supabase.getClient()
     lateinit var note: Note
 
     private val cameraRequest = 1888

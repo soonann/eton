@@ -10,12 +10,16 @@ import io.github.jan.supabase.gotrue.GoTrue
 import kotlinx.coroutines.launch
 
 class Supabase {
-    fun getClient(): SupabaseClient {
-        return createSupabaseClient(
-            supabaseUrl = "SUPABASE_URL_HERE",
-            supabaseKey = "SUPABASE_ANON_TOKEN_HERE",
-        ) {
-            install(Postgrest)
+    companion object {
+        fun getClient(): SupabaseClient {
+            return createSupabaseClient(
+                supabaseUrl = "SUPABASE_URL_HERE",
+                supabaseKey = "SUPABASE_ANON_TOKEN_HERE",
+            ) {
+                install(Postgrest)
+                install(GoTrue)
+            }
         }
+
     }
 }

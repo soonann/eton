@@ -23,6 +23,7 @@ import kotlinx.coroutines.runBlocking
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var client: SupabaseClient
+    private lateinit var userId: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -44,6 +45,9 @@ class LoginActivity : AppCompatActivity() {
                     email = emailText.text.toString()
                     password = pass.text.toString()
                 }
+
+                userId = client.gotrue.retrieveUserForCurrentSession(updateSession = true).id
+                Log.i("userId", userId)
 
                 msg = "User ${emailText.text} success!"
                 auth = true
@@ -76,10 +80,11 @@ class LoginActivity : AppCompatActivity() {
             }
             runOnUiThread {
                 // login and start new activity when authenticated
-    //        if (auth) {
-                    val intent = Intent(context, NoteListActivity::class.java)
-                    startActivity(intent)
-    //        }
+                if (auth) {
+                        val intent = Intent(context, NoteListActivity::class.java)
+                        intent.putExtra("userId", userId)
+                        startActivity(intent)
+                }
             }
         }
     }
@@ -91,10 +96,13 @@ class LoginActivity : AppCompatActivity() {
 
         runBlocking {
             try {
-                val user = client.gotrue.signUpWith(Email) {
+                client.gotrue.signUpWith(Email) {
                     email = emailText.text.toString()
                     password = pass.text.toString()
                 }
+                userId = client.gotrue.retrieveUserForCurrentSession(updateSession = true).id
+                Log.i("userId", userId)
+
                 msg = "User ${emailText.text} sign up success!"
             } catch (e: Exception) {
                 msg = e.localizedMessage.toString().split("\n")[0] // dk if there's a better way to do this LOL

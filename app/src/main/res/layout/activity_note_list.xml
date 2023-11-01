@@ -68,6 +68,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="30dp"
         android:src="@drawable/plus"
+        android:onClick="onAddNote"
         app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

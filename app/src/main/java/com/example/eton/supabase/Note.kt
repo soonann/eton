@@ -13,4 +13,3 @@ data class Note (
     constructor(note_title: String): this(0, note_title, "", "" ) {
     }
 }
-

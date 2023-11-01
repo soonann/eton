@@ -4,12 +4,14 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.eton.R
+import com.example.eton.noteDetail.AddNoteDetailActivity
 import com.example.eton.noteDetail.NoteDetailActivity
 import com.example.eton.supabase.Note
 import com.example.eton.supabase.Supabase
@@ -18,10 +20,13 @@ import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.coroutines.launch
 
 class NoteListActivity : AppCompatActivity() {
+    private lateinit var userId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_list)
+
+        userId = intent.getStringExtra("userId").toString()
 
         // refresh
         val pullToRefresh = findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
@@ -74,6 +79,11 @@ class NoteListActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         fetchNotes()
+    }
+
+    fun onAddNote(view: View) {
+        val intent = Intent(this, AddNoteDetailActivity::class.java)
+        startActivity(intent)
     }
 }
 

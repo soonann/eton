@@ -23,11 +23,14 @@
             android:name=".noteDetail.NoteDetailActivity"
             android:exported="false" />
         <activity
+            android:name=".noteDetail.AddNoteDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".camera.CameraView"
             android:exported="true" />
         <activity
             android:name=".noteList.NoteListActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".login.LoginActivity"
             android:exported="true"

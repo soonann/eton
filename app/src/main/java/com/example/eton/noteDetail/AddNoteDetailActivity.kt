@@ -34,53 +34,59 @@ class AddNoteDetailActivity: AppCompatActivity() {
     }
 
     fun onSave(view: View) {
+
         // populate the data
         val etTitle: EditText = findViewById(R.id.editTextTitle)
         val etBody: EditText = findViewById(R.id.editTextBody)
+        val title = etTitle.text.toString().trim()
+        val body = etBody.text.toString().trim()
+
         var success = false
 
-        // Check if the button has been pressed, won't create duplicate records
-        if (!added) {
-            val id = Random().nextInt(Int.MAX_VALUE)
-            val current = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
-            note = Note(id, etTitle.text.toString(), etBody.text.toString(), current)
+        if (title != "" || body != "") {
+            // Check if the button has been pressed, won't create duplicate records
+            if (!added) {
+                val id = Random().nextInt(Int.MAX_VALUE)
+                val current = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+                note = Note(id, title, body, current)
 
-            try {
-                lifecycleScope.launch {
-                    val response = client.postgrest["notes"].insert(note)
-                    val responseStr = response.body.toString()
-                    Log.i("response", responseStr)
+                try {
+                    lifecycleScope.launch {
+                        val response = client.postgrest["notes"].insert(note)
+                        val responseStr = response.body.toString()
+                        Log.i("response", responseStr)
 
-                    // Get id for the note inserted
-                    val responseJson = JSONArray(responseStr).getJSONObject(0)
-                    noteId = responseJson.getInt("id")
-                    Log.i("response", noteId.toString())
-                }
-                added = true
-                success = true
-            } catch (e: Exception) {
-                Log.e("Err", e.toString())
-            }
-        } else {
-            // Save to db
-            try {
-                lifecycleScope.launch {
-                    client.postgrest["notes"].update ({
-                        set("note_title", etTitle.text.toString() )
-                        set("note_text", etBody.text.toString() )
-                    }){
-                        eq("id", noteId)
+                        // Get id for the note inserted
+                        val responseJson = JSONArray(responseStr).getJSONObject(0)
+                        noteId = responseJson.getInt("id")
+                        Log.i("response", noteId.toString())
                     }
+                    added = true
+                    success = true
+                } catch (e: Exception) {
+                    Log.e("Err", e.toString())
                 }
-                success = true
-            } catch (e: Exception) {
-                Log.e("Err", e.toString())
+            } else {
+                // Save to db
+                try {
+                    lifecycleScope.launch {
+                        client.postgrest["notes"].update ({
+                            set("note_title", title )
+                            set("note_text", body )
+                        }){
+                            eq("id", noteId)
+                        }
+                    }
+                    success = true
+                } catch (e: Exception) {
+                    Log.e("Err", e.toString())
+                }
             }
-        }
-        if (success) {
-            Toast.makeText(this, "Successfully saved data!", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "Unable to save data", Toast.LENGTH_SHORT).show()
+            if (success) {
+                Toast.makeText(this, "Successfully saved data!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Unable to save data", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

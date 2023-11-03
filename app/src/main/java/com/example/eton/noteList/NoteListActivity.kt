@@ -3,7 +3,6 @@ package com.example.eton.noteList
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -11,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.eton.R
-import com.example.eton.noteDetail.AddNoteDetailActivity
 import com.example.eton.noteDetail.NoteDetailActivity
 import com.example.eton.supabase.Note
 import com.example.eton.supabase.Supabase

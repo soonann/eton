@@ -37,6 +37,9 @@ import java.util.Base64
 import java.util.Random
 import kotlin.properties.Delegates
 
+/**
+ * Unused; prolly can delete sooner or later
+ */
 class AddNoteDetailActivity: AppCompatActivity() {
     private var added = false
     private lateinit var btn: Button

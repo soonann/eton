@@ -19,7 +19,7 @@
             android:layout_weight="1">
 
             <TextView
-                android:id="@+id/textView"
+                android:id="@+id/noteTitle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
@@ -28,10 +28,10 @@
                 />
 
             <TextView
-                android:id="@+id/locationTextTag"
+                android:id="@+id/noteLocation"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Description of your note"
+                android:text="Location tagged to your note"
                 />
         </LinearLayout>
 

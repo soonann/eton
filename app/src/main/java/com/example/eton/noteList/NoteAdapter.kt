@@ -34,11 +34,13 @@ class NoteAdapter(
 
     // Holder class
      class NoteViewHolder(view: View, val onClick: (Note) -> Unit) : RecyclerView.ViewHolder(view) {
-        private val textView: TextView
+        private val noteTitle: TextView
+        private val noteLocation: TextView
         private var currentNote: Note? = null
 
         init {
-            textView = view.findViewById(R.id.textView)
+            noteTitle = view.findViewById(R.id.noteTitle)
+            noteLocation = view.findViewById(R.id.noteLocation)
             itemView.setOnClickListener {
                 currentNote?.let {
                     onClick(it)
@@ -49,7 +51,8 @@ class NoteAdapter(
         //  bind the data and onClick on to the item
         fun bind(note: Note){
             currentNote = note
-            textView.text = note.note_title
+            noteTitle.text = note.note_title
+            noteLocation.text = if (note.note_location.isEmpty()) "No Location tagged :'(" else note.note_location
         }
     }
 }

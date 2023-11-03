@@ -134,6 +134,9 @@ class NoteDetailActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Trigger add location via Places API
+     */
     fun onAddLocation(view: View) {
         try {
             val fields = listOf(
@@ -147,6 +150,9 @@ class NoteDetailActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Save/Add note
+     */
     fun onSave(view: View){
         var saved = false
         val title = etTitle.text.toString().trim()

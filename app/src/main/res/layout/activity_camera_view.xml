@@ -17,5 +17,17 @@
         android:background="#000"
         android:id="@+id/cameraView"/>
 
+    <ImageButton
+        android:id="@+id/take_picture_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="182dp"
+        android:layout_marginEnd="182dp"
+        android:layout_marginBottom="40dp"
+        android:src="@drawable/camera_vector" />
+
 
 </RelativeLayout>

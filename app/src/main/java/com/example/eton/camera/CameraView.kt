@@ -2,17 +2,23 @@ package com.example.eton.camera
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.*
 import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
+import android.hardware.camera2.CaptureRequest
+import android.hardware.camera2.CaptureResult
+import android.hardware.camera2.TotalCaptureResult
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
+import android.provider.MediaStore
 import android.view.Surface
 import android.view.TextureView
+import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.example.eton.R
@@ -38,11 +44,20 @@ class CameraView : AppCompatActivity() {
     lateinit var textureView: TextureView
     lateinit var model:SsdMobilenetV11Metadata1
 
+    private lateinit var photoBitmap: Bitmap
+    private val takePictureButton: ImageButton by lazy { findViewById(R.id.take_picture_button) }
+    private val REQUEST_CODE_TAKE_PICTURE = 101
+
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera_view)
         get_permission()
+
+//        takePictureButton.setOnClickListener {
+//            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+//            startActivityForResult(cameraIntent, REQUEST_CODE_TAKE_PICTURE)
+//        }
 
         labels = FileUtil.loadLabels(this, "labels.txt")
         imageProcessor = ImageProcessor.Builder().add(ResizeOp(300, 300, ResizeOp.ResizeMethod.BILINEAR)).build()
@@ -74,7 +89,7 @@ class CameraView : AppCompatActivity() {
                 val locations = outputs.locationsAsTensorBuffer.floatArray
                 val classes = outputs.classesAsTensorBuffer.floatArray
                 val scores = outputs.scoresAsTensorBuffer.floatArray
-                val numberOfDetections = outputs.numberOfDetectionsAsTensorBuffer.floatArray
+                outputs.numberOfDetectionsAsTensorBuffer.floatArray
 
                 var mutable = bitmap.copy(Bitmap.Config.ARGB_8888, true)
                 val canvas = Canvas(mutable)
@@ -110,6 +125,19 @@ class CameraView : AppCompatActivity() {
         super.onDestroy()
         model.close()
     }
+
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        if (requestCode == REQUEST_CODE_TAKE_PICTURE && resultCode == RESULT_OK) {
+//            photoBitmap = data?.extras?.getParcelable<Bitmap>("photoBitmap")!!
+//
+//            // Return to the previous intent
+//            val intent = Intent()
+//            intent.putExtra("photoBitmap", photoBitmap)
+//            setResult(RESULT_OK, intent)
+//            finish()
+//        }
+//    }
 
     @SuppressLint("MissingPermission")
     fun open_camera(){

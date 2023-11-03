@@ -15,18 +15,22 @@ import com.example.eton.noteDetail.AddNoteDetailActivity
 import com.example.eton.noteDetail.NoteDetailActivity
 import com.example.eton.supabase.Note
 import com.example.eton.supabase.Supabase
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.coroutines.launch
 
 class NoteListActivity : AppCompatActivity() {
     private lateinit var userId: String
+    private val client = Supabase.getClient()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_list)
 
         userId = intent.getStringExtra("userId").toString()
+        val session = client.gotrue.currentSessionOrNull()
 
         // refresh
         val pullToRefresh = findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)

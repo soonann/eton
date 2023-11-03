@@ -1,21 +1,32 @@
 package com.example.eton.noteDetail
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.eton.R
 import com.example.eton.supabase.Note
 import com.example.eton.supabase.Supabase
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
 import org.json.JSONArray
+import java.io.ByteArrayOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Base64
 import java.util.Random
 import kotlin.properties.Delegates
 
@@ -25,12 +36,27 @@ class AddNoteDetailActivity: AppCompatActivity() {
     private val client = Supabase.getClient()
     private lateinit var note: Note
     private var noteId by Delegates.notNull<Int>()
+
+    private val cameraRequest = 1888
+    private lateinit var imageView: ImageView
+    private var photo: Bitmap? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_detail)
 
         btn = findViewById(R.id.btnSave)
         btn.text = "Add New Note"
+
+        imageView = findViewById(R.id.imageView)
+
+        if (ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_DENIED)
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), cameraRequest)
+        val cameraBtn: FloatingActionButton = findViewById(R.id.cameraBtn)
+        cameraBtn.setOnClickListener {
+            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(cameraIntent, cameraRequest)
+        }
     }
 
     fun onSave(view: View) {
@@ -42,13 +68,14 @@ class AddNoteDetailActivity: AppCompatActivity() {
         val body = etBody.text.toString().trim()
 
         var success = false
+        val photoStr: String? = photo?.let { bitmapToBase64(it) }
 
         if (title != "" || body != "") {
             // Check if the button has been pressed, won't create duplicate records
             if (!added) {
                 val id = Random().nextInt(Int.MAX_VALUE)
                 val current = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
-                note = Note(id, title, body, current)
+                note = Note(id, title, body, current, photoStr)
 
                 try {
                     lifecycleScope.launch {
@@ -73,6 +100,7 @@ class AddNoteDetailActivity: AppCompatActivity() {
                         client.postgrest["notes"].update ({
                             set("note_title", title )
                             set("note_text", body )
+                            set("note_photo", photoStr)
                         }){
                             eq("id", noteId)
                         }
@@ -88,5 +116,28 @@ class AddNoteDetailActivity: AppCompatActivity() {
                 Toast.makeText(this, "Unable to save data", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    /**
+     * Take picture and return as an image
+     */
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode != RESULT_CANCELED) {
+            if (requestCode == cameraRequest) {
+                photo = data?.extras?.get("data") as Bitmap
+                imageView.setImageBitmap(photo)
+            }
+        }
+    }
+
+    /**
+     * Convert a Bitmap type into a String
+     */
+    private fun bitmapToBase64(bitmap: Bitmap): String {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+        val byteArray = byteArrayOutputStream.toByteArray()
+        return Base64.getEncoder().encodeToString(byteArray)
     }
 }

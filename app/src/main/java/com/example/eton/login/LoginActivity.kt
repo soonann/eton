@@ -61,22 +61,11 @@ class LoginActivity : AppCompatActivity() {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val bucket = client.storage.retrieveBucketById(bucketId = emailText.text.toString())!!
+                val bucket = client.storage.retrieveBucketById(bucketId = "images")!!
+                Log.i("bucket", bucket.id)
             } catch (e: Exception) {
                 val msg = e.message.toString().split("\n")[0]
                 Log.e("err", e.toString())
-
-                // Create a bucket
-                // TODO: Enable RLS policy in the db so that can create bucket
-//                if (msg == "Bucket not found (Bucket not found)") {
-//                    val bucket = client.storage.createBucket(id = emailText.text.toString()) {
-//                        public = true
-//                        fileSizeLimit = 1.megabytes
-//                    }
-//                    Log.i("bucket", bucket.toString())
-//                } else {
-//                    Log.e("err", e.toString())
-//                }
             }
             runOnUiThread {
                 // login and start new activity when authenticated

@@ -13,6 +13,8 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet.Constraint
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -40,6 +42,8 @@ class AddNoteDetailActivity: AppCompatActivity() {
     private val cameraRequest = 1888
     private lateinit var imageView: ImageView
     private var photo: Bitmap? = null
+    private var isImageFullScreen = false
+    private var originalLayoutParams: ConstraintLayout.LayoutParams? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_detail)
@@ -48,6 +52,12 @@ class AddNoteDetailActivity: AppCompatActivity() {
         btn.text = "Add New Note"
 
         imageView = findViewById(R.id.imageView)
+        imageView.setOnClickListener {
+            isImageFullScreen = !isImageFullScreen
+            setImageSize(imageView, isImageFullScreen)
+        }
+        originalLayoutParams = imageView.layoutParams as ConstraintLayout.LayoutParams
+
 
         if (ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_DENIED)
@@ -56,6 +66,20 @@ class AddNoteDetailActivity: AppCompatActivity() {
         cameraBtn.setOnClickListener {
             val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             startActivityForResult(cameraIntent, cameraRequest)
+        }
+    }
+
+    /**
+     * Resize image onClick
+     */
+    fun setImageSize(imageView: ImageView, isImageFullScreen: Boolean) {
+        if (isImageFullScreen) {
+            imageView.layoutParams = ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.MATCH_PARENT,
+                ConstraintLayout.LayoutParams.MATCH_PARENT
+            )
+        } else {
+            imageView.layoutParams = originalLayoutParams
         }
     }
 

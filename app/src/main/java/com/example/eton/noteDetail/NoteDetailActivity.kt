@@ -13,7 +13,11 @@ import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
+import android.widget.RelativeLayout.LayoutParams
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -31,10 +35,12 @@ class NoteDetailActivity : AppCompatActivity() {
 
     private val client = Supabase.getClient()
     private lateinit var note: Note
+    private var isImageFullScreen = false
 
     private val cameraRequest = 1888
     private lateinit var imageView: ImageView
     private var photo: Bitmap? = null
+    private var originalLayoutParams: ConstraintLayout.LayoutParams? = null
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,11 +55,12 @@ class NoteDetailActivity : AppCompatActivity() {
         val etTitle: EditText = findViewById(R.id.editTextTitle)
         val etBody: EditText = findViewById(R.id.editTextBody)
 
-        imageView = findViewById(R.id.imageView)
         // set the title and text
         etTitle.setText(note.note_title)
         etBody.setText(note.note_text)
         if (note.note_photo != null) {
+            imageView = findViewById(R.id.imageView)
+
             val base64String = note.note_photo!!
 
             // Create a Bitmap object from the byte array.
@@ -61,6 +68,13 @@ class NoteDetailActivity : AppCompatActivity() {
 
             // Display the bitmap in the ImageView.
             imageView.setImageBitmap(bitmap)
+
+            imageView.setOnClickListener {
+                isImageFullScreen = !isImageFullScreen
+                setImageSize(imageView, isImageFullScreen)
+            }
+            // get the original layout param of picture incase
+            originalLayoutParams = imageView.layoutParams as ConstraintLayout.LayoutParams
         }
 
         if (ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.CAMERA)
@@ -99,6 +113,20 @@ class NoteDetailActivity : AppCompatActivity() {
             Toast.makeText(this, "Successfully saved data!", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(this, "Unable to save data", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * Resize image onClick
+     */
+    fun setImageSize(imageView: ImageView, isImageFullScreen: Boolean) {
+        if (isImageFullScreen) {
+            imageView.layoutParams = ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.MATCH_PARENT,
+                ConstraintLayout.LayoutParams.MATCH_PARENT
+            )
+        } else {
+            imageView.layoutParams = originalLayoutParams
         }
     }
 

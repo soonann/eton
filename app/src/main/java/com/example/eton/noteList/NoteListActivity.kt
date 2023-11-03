@@ -15,7 +15,6 @@ import com.example.eton.noteDetail.AddNoteDetailActivity
 import com.example.eton.noteDetail.NoteDetailActivity
 import com.example.eton.supabase.Note
 import com.example.eton.supabase.Supabase
-import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Order
@@ -62,6 +61,7 @@ class NoteListActivity : AppCompatActivity() {
             data,
         ) { note:Note ->
             val intent = Intent(this, NoteDetailActivity::class.java)
+            intent.putExtra("isNew", false)
             intent.putExtra("note", note)
             startActivity(intent)
         };
@@ -86,7 +86,8 @@ class NoteListActivity : AppCompatActivity() {
     }
 
     fun onAddNote(view: View) {
-        val intent = Intent(this, AddNoteDetailActivity::class.java)
+        val intent = Intent(this, NoteDetailActivity::class.java)
+        intent.putExtra("isNew", true)
         startActivity(intent)
     }
 }

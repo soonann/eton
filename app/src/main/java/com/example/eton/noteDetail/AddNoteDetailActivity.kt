@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet.Constraint
 import androidx.core.app.ActivityCompat
@@ -21,6 +22,10 @@ import androidx.lifecycle.lifecycleScope
 import com.example.eton.R
 import com.example.eton.supabase.Note
 import com.example.eton.supabase.Supabase
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.widget.Autocomplete
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
@@ -38,6 +43,7 @@ class AddNoteDetailActivity: AppCompatActivity() {
     private val client = Supabase.getClient()
     private lateinit var note: Note
     private var noteId by Delegates.notNull<Int>()
+    private lateinit var etLocation: AppCompatEditText
 
     private val cameraRequest = 1888
     private lateinit var imageView: ImageView
@@ -58,6 +64,12 @@ class AddNoteDetailActivity: AppCompatActivity() {
         }
         originalLayoutParams = imageView.layoutParams as ConstraintLayout.LayoutParams
 
+        if (!Places.isInitialized()) {
+            Places.initialize(this@AddNoteDetailActivity,
+                resources.getString(R.string.google_maps_api_key))
+        }
+
+        etLocation = findViewById(R.id.editTextLocation)
 
         if (ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_DENIED)
@@ -72,7 +84,7 @@ class AddNoteDetailActivity: AppCompatActivity() {
     /**
      * Resize image onClick
      */
-    fun setImageSize(imageView: ImageView, isImageFullScreen: Boolean) {
+    private fun setImageSize(imageView: ImageView, isImageFullScreen: Boolean) {
         if (isImageFullScreen) {
             imageView.layoutParams = ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.MATCH_PARENT,
@@ -84,22 +96,23 @@ class AddNoteDetailActivity: AppCompatActivity() {
     }
 
     fun onSave(view: View) {
+        var success = false
 
         // populate the data
         val etTitle: EditText = findViewById(R.id.editTextTitle)
         val etBody: EditText = findViewById(R.id.editTextBody)
+
         val title = etTitle.text.toString().trim()
         val body = etBody.text.toString().trim()
-
-        var success = false
-        val photoStr: String? = photo?.let { bitmapToBase64(it) }
+        val location = etLocation.text.toString()
+        val photoStr: String = photo?.let { bitmapToBase64(it) } ?: ""
 
         if (title != "" || body != "") {
             // Check if the button has been pressed, won't create duplicate records
             if (!added) {
                 val id = Random().nextInt(Int.MAX_VALUE)
                 val current = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
-                note = Note(id, title, body, current, photoStr)
+                note = Note(id, title, body, current, location, photoStr)
 
                 try {
                     lifecycleScope.launch {
@@ -142,6 +155,19 @@ class AddNoteDetailActivity: AppCompatActivity() {
         }
     }
 
+    fun onAddLocation(view: View) {
+        try {
+            val fields = listOf(
+                Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS
+            )
+            val intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, fields)
+                .build(this@AddNoteDetailActivity)
+            startActivityForResult(intent, AddNoteDetailActivity.PLACE_AUTOCOMPLETE_REQUEST_CODE)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     /**
      * Take picture and return as an image
      */
@@ -151,6 +177,9 @@ class AddNoteDetailActivity: AppCompatActivity() {
             if (requestCode == cameraRequest) {
                 photo = data?.extras?.get("data") as Bitmap
                 imageView.setImageBitmap(photo)
+            } else if (requestCode == AddNoteDetailActivity.PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+                val place: Place = Autocomplete.getPlaceFromIntent(data!!)
+                etLocation.setText(place.address)
             }
         }
     }
@@ -163,5 +192,9 @@ class AddNoteDetailActivity: AppCompatActivity() {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
         return Base64.getEncoder().encodeToString(byteArray)
+    }
+
+    companion object {
+        private const val PLACE_AUTOCOMPLETE_REQUEST_CODE = 1
     }
 }

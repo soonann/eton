@@ -9,7 +9,7 @@ import com.example.eton.R
 import com.example.eton.supabase.Note
 
 class NoteAdapter(
-    private val dataSet: List<Note>,
+    private val dataSet: MutableList<Note>,
     private val onClick: (Note) -> Unit,
     )
     : RecyclerView.Adapter<NoteAdapter.NoteViewHolder> (){

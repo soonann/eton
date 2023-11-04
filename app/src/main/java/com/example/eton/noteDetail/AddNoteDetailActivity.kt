@@ -115,7 +115,7 @@ class AddNoteDetailActivity: AppCompatActivity() {
             if (!added) {
                 val id = Random().nextInt(Int.MAX_VALUE)
                 val current = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
-                note = Note(id, title, body, current, location, photoStr)
+                note = Note(id, title, body, current, location, photoStr, 0.0, 0.0)
 
                 try {
                     lifecycleScope.launch {

@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
+import android.speech.RecognizerIntent
 import android.util.Log
 import android.view.View
 import android.widget.EditText
@@ -51,6 +52,8 @@ import java.io.ByteArrayOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Base64
+import java.util.Locale
+import java.util.Objects
 import java.util.Random
 import kotlin.properties.Delegates
 
@@ -191,7 +194,7 @@ class NoteDetailActivity : AppCompatActivity() {
     }
 
     /**
-     * Result of camera and Places API activity
+     * Results for various activities
      */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -206,6 +209,12 @@ class NoteDetailActivity : AppCompatActivity() {
                 note.note_location = place.address!!
                 note.lat = place.latLng!!.latitude
                 note.long = place.latLng!!.longitude
+            } else if (requestCode == SPEECH_INPUT) {
+                if (data != null) {
+                    val res: ArrayList<String> = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
+                    val tempBody = "${etBody.text} ${Objects.requireNonNull(res)[0]}"
+                    etBody.setText(tempBody)
+                }
             }
         }
     }
@@ -273,6 +282,31 @@ class NoteDetailActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Record button clicked
+     */
+    fun onVoiceRecord(view: View) {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+
+        intent.putExtra(
+            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+        )
+
+        intent.putExtra(
+            RecognizerIntent.EXTRA_LANGUAGE,
+            Locale.getDefault()
+        )
+
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speech to text")
+
+        try {
+            startActivityForResult(intent, SPEECH_INPUT)
+        } catch (e: Exception) {
+            Toast.makeText(this@NoteDetailActivity, "Unable to record:: " + e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     // ---------------- UTILS ----------------
     /**
      * Convert a Bitmap type into a String
@@ -325,27 +359,6 @@ class NoteDetailActivity : AppCompatActivity() {
         mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallBack, Looper.myLooper())
     }
 
-    private val mLocationCallBack = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult) {
-            val mLastLocation: Location = locationResult.lastLocation!!
-            note.lat = mLastLocation.latitude
-            note.long = mLastLocation.longitude
-
-            val addressTask = GetAddressFromLatLng(this@NoteDetailActivity, note.lat, note.long)
-            addressTask.setAddressListener(object: GetAddressFromLatLng.AddressListener {
-                override fun onAddressFound(address: String?) {
-                    etLocation.setText(address)
-                    note.note_location = address!!
-                }
-
-                override fun onError() {
-                    Log.e("Get address:: ", "Something went wrong")
-                }
-            })
-            addressTask.getAddress()
-        }
-    }
-
     /**
      * A function used to show the alert dialog when the permissions are denied and need to allow it from settings app info.
      */
@@ -370,11 +383,36 @@ class NoteDetailActivity : AppCompatActivity() {
             }.show()
     }
 
+    /**
+     * For getting current location's name if there is any
+     */
+    private val mLocationCallBack = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            val mLastLocation: Location = locationResult.lastLocation!!
+            note.lat = mLastLocation.latitude
+            note.long = mLastLocation.longitude
+
+            val addressTask = GetAddressFromLatLng(this@NoteDetailActivity, note.lat, note.long)
+            addressTask.setAddressListener(object: GetAddressFromLatLng.AddressListener {
+                override fun onAddressFound(address: String?) {
+                    etLocation.setText(address)
+                    note.note_location = address!!
+                }
+
+                override fun onError() {
+                    Log.e("Get address:: ", "Something went wrong")
+                }
+            })
+            addressTask.getAddress()
+        }
+    }
+
 
     // ---------------- CONST VAR ----------------
     companion object {
         private const val PLACE_AUTOCOMPLETE_REQUEST_CODE = 1
-        private const val CAMERA_REQUEST = 1888
+        private const val CAMERA_REQUEST = 2
+        private const val SPEECH_INPUT = 3
     }
 
     // Image detector

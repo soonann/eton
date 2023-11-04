@@ -1,5 +1,7 @@
 package com.example.eton.noteList
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -29,6 +31,7 @@ class NoteListActivity : AppCompatActivity() {
     private lateinit var data: MutableList<Note>
     private lateinit var noteAdapter: NoteAdapter
     private lateinit var rv: RecyclerView
+    private lateinit var alertDialog: AlertDialog.Builder
 
     private val callback: ItemTouchHelper.SimpleCallback = object :
         ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -42,10 +45,7 @@ class NoteListActivity : AppCompatActivity() {
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             Log.i("what am i", data.get(viewHolder.adapterPosition).toString())
-            val deleted = deleteNote(viewHolder.adapterPosition, viewHolder)
-            val msg = if (deleted) "Item deleted" else "Unable to delete note"
-            val snackbar = Snackbar.make(rv, msg, Snackbar.LENGTH_LONG)
-            snackbar.show()
+            deleteNote(viewHolder.adapterPosition, viewHolder)
         }
     }
 
@@ -62,6 +62,8 @@ class NoteListActivity : AppCompatActivity() {
             fetchNotes() // your code
             pullToRefresh.isRefreshing = false
         }
+
+        alertDialog = AlertDialog.Builder(this)
 
         // set layout manager of recycler view
         val manager = LinearLayoutManager(this)
@@ -121,24 +123,32 @@ class NoteListActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun deleteNote(position: Int, viewHolder: RecyclerView.ViewHolder): Boolean {
+    private fun deleteNote(position: Int, viewHolder: RecyclerView.ViewHolder) {
         var deleted = false
-        try {
-            val noteId = data[position].id
-            lifecycleScope.launch {
-                client.postgrest["notes"].delete { eq("id", noteId) }
-            }
-            deleted = true
-        } catch (e: Exception) {
-            Log.e("err", "Unable to delete note:: $e")
-        }
-        return if (deleted) {
-            data.removeAt(viewHolder.adapterPosition)
-            noteAdapter.notifyDataSetChanged()
-            true
-        } else {
-            false
-        }
+        alertDialog.setTitle("Warning!")
+            .setMessage("Do you want to delete this note?")
+            .setCancelable(true)
+            .setNegativeButton("Yes") { dialog, which ->
+                try {
+                    val noteId = data[position].id
+                    lifecycleScope.launch {
+                        client.postgrest["notes"].delete { eq("id", noteId) }
+                    }
+                    deleted = true
+                } catch (e: Exception) {
+                    Log.e("err", "Unable to delete note:: $e")
+                }
+                if (deleted) {
+                    data.removeAt(viewHolder.adapterPosition)
+                    noteAdapter.notifyDataSetChanged()
+                }
+                val msg = if (deleted) "Item deleted" else "Unable to delete note"
+                val snackbar = Snackbar.make(rv, msg, Snackbar.LENGTH_SHORT)
+                snackbar.show()
+            }.setNeutralButton("Cancel") { dialog, which ->
+                fetchNotes()
+            }.create()
+        alertDialog.show()
     }
 }
 

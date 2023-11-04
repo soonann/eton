@@ -76,6 +76,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    implementation("com.google.mlkit:image-labeling:17.0.7")
 
     implementation("org.tensorflow:tensorflow-lite-support:0.1.0")
     implementation("org.tensorflow:tensorflow-lite-metadata:0.1.0")
@@ -84,6 +85,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:18.2.0")
 
     implementation("com.karumi:dexter:6.2.3")
+    implementation("com.android.volley:volley:1.2.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

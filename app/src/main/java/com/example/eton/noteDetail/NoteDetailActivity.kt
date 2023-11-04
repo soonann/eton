@@ -2,6 +2,7 @@ package com.example.eton.noteDetail
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.ProgressDialog
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -20,16 +21,19 @@ import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
+import com.example.eton.ConversationActivity
 import com.example.eton.R
-import com.example.eton.map.GetAddressFromLatLng
+import com.example.eton.utils.GetAddressFromLatLng
 import com.example.eton.map.MapActivity
 import com.example.eton.supabase.Note
 import com.example.eton.supabase.Supabase
+import com.example.eton.utils.CustomTextWatcher
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -40,6 +44,10 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.label.ImageLabeler
+import com.google.mlkit.vision.label.ImageLabeling
+import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -72,8 +80,11 @@ class NoteDetailActivity : AppCompatActivity() {
     private lateinit var etBody: EditText
     private lateinit var etLocation: AppCompatEditText
     private lateinit var imageView: ImageView
+    private lateinit var imageLabelText: TextView
 
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
+    private lateinit var imageLabeler: ImageLabeler
+    private lateinit var progressDialog: ProgressDialog
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,10 +98,19 @@ class NoteDetailActivity : AppCompatActivity() {
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
+        progressDialog = ProgressDialog(this)
+        progressDialog.setTitle("Please wait...")
+        progressDialog.setCanceledOnTouchOutside(false)
+        imageLabeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
+
         etTitle = findViewById(R.id.editTextTitle)
         etBody = findViewById(R.id.editTextBody)
+        val textWatcher = CustomTextWatcher()
+        etBody.addTextChangedListener(textWatcher)
         etLocation = findViewById(R.id.editTextLocation)
         imageView = findViewById(R.id.imageView)
+        imageLabelText = findViewById(R.id.imageLabelText)
+        imageLabelText.text = ""
 
         val it = intent.getSerializableExtra("isNew") as Boolean
         if (!it) {
@@ -135,6 +155,10 @@ class NoteDetailActivity : AppCompatActivity() {
             // Display the bitmap in the ImageView.
             imageView.setImageBitmap(bitmap)
         }
+
+        if (note.photo_labels.isNotEmpty()) {
+            imageLabelText.setText(note.photo_labels)
+        }
     }
 
     /**
@@ -154,6 +178,7 @@ class NoteDetailActivity : AppCompatActivity() {
                         set("lat", note.lat)
                         set("long", note.long)
                         set("note_photo", note.note_photo)
+                        set("photo_labels", note.photo_labels)
                     }){
                         eq("id", note.id)
                     }
@@ -202,6 +227,7 @@ class NoteDetailActivity : AppCompatActivity() {
             if (requestCode == CAMERA_REQUEST) {
                 photo = data?.extras?.get("data") as Bitmap
                 imageView.setImageBitmap(photo)
+                labelImage(photo!!)
                 note.note_photo = photo?.let { bitmapToBase64(it) } ?: ""
             } else if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
                 val place: Place = Autocomplete.getPlaceFromIntent(data!!)
@@ -307,6 +333,11 @@ class NoteDetailActivity : AppCompatActivity() {
         }
     }
 
+    fun onConversation(view: View) {
+        val intent = Intent(this, ConversationActivity::class.java)
+        startActivity(intent)
+    }
+
     // ---------------- UTILS ----------------
     /**
      * Convert a Bitmap type into a String
@@ -405,6 +436,34 @@ class NoteDetailActivity : AppCompatActivity() {
             })
             addressTask.getAddress()
         }
+    }
+
+    /**
+     * Labelling image
+     */
+    private fun labelImage(photo: Bitmap) {
+        progressDialog.setMessage("Preparing image...")
+        progressDialog.show()
+
+        val inputImage = InputImage.fromBitmap(photo, 0)
+
+        progressDialog.setMessage("Labelling image...")
+
+        imageLabeler.process(inputImage)
+            .addOnSuccessListener {imageLabels ->
+                imageLabelText.text = ""
+                for (i in 0..2) {
+                    val text = imageLabels[i].text
+                    val confidence = imageLabels[i].confidence
+                    imageLabelText.append("$text : $confidence\n")
+                }
+                progressDialog.dismiss()
+                note.photo_labels = imageLabelText.text.toString()
+            }
+            .addOnFailureListener { e ->
+                progressDialog.dismiss()
+                Toast.makeText(this, "Failed due to ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
 

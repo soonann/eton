@@ -1,4 +1,4 @@
-package com.example.eton.map
+package com.example.eton.utils
 
 import android.content.Context
 import android.location.Address

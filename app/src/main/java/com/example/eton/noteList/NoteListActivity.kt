@@ -49,7 +49,6 @@ class NoteListActivity : AppCompatActivity() {
 
         // fetch data from supabase
         fetchNotes()
-
     }
 
     private fun setAdapterData(data: List<Note>){

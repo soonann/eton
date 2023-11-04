@@ -54,6 +54,7 @@
             android:layout_width="0dp"
             android:layout_weight="0.9"
             android:layout_height="match_parent"
+            android:onClick="onCurrentLocation"
             android:text="Current location"
             android:fontFamily="@font/ssp_bold"/>
     </LinearLayout>
@@ -99,7 +100,7 @@
                 android:layout_gravity="bottom|end"
                 android:src="@drawable/camera_vector"
                 android:layout_margin="10dp"
-                android:onClick="imageDetector"
+                android:onClick="onCameraOpen"
                 app:fabSize="normal"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />

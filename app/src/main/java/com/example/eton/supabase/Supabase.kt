@@ -3,12 +3,8 @@ package com.example.eton.supabase
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.postgrest.postgrest
-import androidx.lifecycle.lifecycleScope
-import io.github.jan.supabase.gotrue.FlowType
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.storage.Storage
-import kotlinx.coroutines.launch
 
 class Supabase {
     companion object {

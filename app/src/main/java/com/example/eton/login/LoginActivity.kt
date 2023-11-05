@@ -68,23 +68,14 @@ class LoginActivity : AppCompatActivity() {
 
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
         lifecycleScope.launch(Dispatchers.IO) {
-//            try {
-//                val bucket = client.storage.retrieveBucketById(bucketId = "images")!!
-//                Log.i("bucket", bucket.id)
-//            } catch (e: Exception) {
-//                val msg = e.message.toString().split("\n")[0]
-//                Log.e("err", e.toString())
-//            }
-//            runOnUiThread {
-                // login and start new activity when authenticated
-                if (auth) {
-                    val intent = Intent(context, NoteListActivity::class.java)
-                    intent.putExtra("userId", userId)
-                    emailText.text = ""
-                    pass.text = ""
-                    startActivity(intent)
-                }
-//            }
+            // login and start new activity when authenticated
+            if (auth) {
+                val intent = Intent(context, NoteListActivity::class.java)
+                intent.putExtra("userId", userId)
+                emailText.text = ""
+                pass.text = ""
+                startActivity(intent)
+            }
         }
     }
 

@@ -14,8 +14,6 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.gotrue
 import com.example.eton.supabase.Supabase
 import io.github.jan.supabase.gotrue.providers.builtin.Email
-import io.github.jan.supabase.storage.Bucket
-import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -28,6 +26,10 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         client = Supabase.getClient()
+        Intent(applicationContext, LocationService::class.java).apply {
+            action = LocationService.ACTION_START
+            startService(this)
+        }
     }
 
     // onLogin button clicked

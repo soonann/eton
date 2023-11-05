@@ -6,6 +6,7 @@ import android.app.ProgressDialog
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.location.Location
@@ -26,6 +27,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.eton.ConversationActivity
 import com.example.eton.R
@@ -266,8 +269,12 @@ class NoteDetailActivity : AppCompatActivity() {
      * Open camera activity
      */
     fun onCameraOpen(view: View) {
-        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        startActivityForResult(cameraIntent, CAMERA_REQUEST)
+        if (!isCameraEnabled()) {
+            Toast.makeText(this, "Your camera permission is turned off. Please turn it on to work!", Toast.LENGTH_SHORT).show()
+        } else {
+            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(cameraIntent, CAMERA_REQUEST)
+        }
     }
 
     /**
@@ -377,6 +384,22 @@ class NoteDetailActivity : AppCompatActivity() {
     private fun isLocationEnabled(): Boolean {
         val locationManager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    }
+
+    /**
+     * Check if camera is enabled, else request permissions
+     */
+    private fun isCameraEnabled(): Boolean {
+        return if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA),
+                CAMERA_REQUEST
+            )
+            false
+        } else {
+            true
+        }
     }
 
 

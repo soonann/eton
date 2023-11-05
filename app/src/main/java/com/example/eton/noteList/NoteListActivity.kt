@@ -19,6 +19,8 @@ import com.example.eton.R
 import com.example.eton.noteDetail.NoteDetailActivity
 import com.example.eton.supabase.Note
 import com.example.eton.supabase.Supabase
+import com.google.android.gms.location.GeofencingClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.postgrest.postgrest
@@ -36,6 +38,7 @@ class NoteListActivity : AppCompatActivity() {
     private lateinit var noteAdapter: NoteAdapter
     private lateinit var rv: RecyclerView
     private lateinit var alertDialog: AlertDialog.Builder
+    private lateinit var geofencingClient: GeofencingClient
 
     private val callback: ItemTouchHelper.SimpleCallback = object :
         ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -56,6 +59,8 @@ class NoteListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_list)
+
+        geofencingClient = LocationServices.getGeofencingClient(this)
 
         // handle intent
         userId = intent.getStringExtra("userId").toString()
@@ -179,6 +184,11 @@ class NoteListActivity : AppCompatActivity() {
             .setMessage("Do you want to delete this note?")
             .setCancelable(true)
             .setNegativeButton("Yes") { dialog, which ->
+                //remove geofence if there is one
+                if (data[position].lat != null) {
+                    removeGeofence(data[position].note_title)
+                }
+
                 try {
                     val noteId = data[position].id
                     lifecycleScope.launch {
@@ -200,6 +210,20 @@ class NoteListActivity : AppCompatActivity() {
             }.create()
         alertDialog.show()
     }
+
+    private fun removeGeofence(id: String) {
+        val geofenceId = listOf(id)
+        geofencingClient.removeGeofences(geofenceId).run {
+            addOnSuccessListener {
+                Log.v("geofence remove", "success")
+            }
+            addOnFailureListener {
+                Log.e("geofence remove", "failure")
+            }
+        }
+
+    }
+
 }
 
 

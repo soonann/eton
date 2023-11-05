@@ -72,7 +72,6 @@ import java.util.Locale
 import java.util.Objects
 import java.util.Random
 import kotlin.properties.Delegates
-
 class NoteDetailActivity : AppCompatActivity() {
     // for new note
     private var added = false
@@ -93,8 +92,8 @@ class NoteDetailActivity : AppCompatActivity() {
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private lateinit var imageLabeler: ImageLabeler
     private lateinit var progressDialog: ProgressDialog
-    lateinit var geofencingClient: GeofencingClient
-    private val geofenceList = ArrayList<Geofence>()
+    public lateinit var geofencingClient: GeofencingClient
+    public val geofenceList = ArrayList<Geofence>()
     private val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 3 // random unique value
     private val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 4
     private val REQUEST_TURN_DEVICE_LOCATION_ON = 5
@@ -552,6 +551,7 @@ class NoteDetailActivity : AppCompatActivity() {
     }
     @SuppressLint("MissingPermission")
     private fun addGeofenceRequest() {
+        geofencePendingIntent.creatorUid
         if(!this.hasLocationPermission()) {
             ActivityCompat.requestPermissions(
                 this,

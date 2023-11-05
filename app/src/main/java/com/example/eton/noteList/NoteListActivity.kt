@@ -1,13 +1,14 @@
 package com.example.eton.noteList
 
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.SearchView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.text.toLowerCase
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -24,11 +25,14 @@ import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.coroutines.launch
 import java.lang.Exception
+import java.util.Locale
+
 
 class NoteListActivity : AppCompatActivity() {
     private lateinit var userId: String
     private val client = Supabase.getClient()
     private lateinit var data: MutableList<Note>
+    private lateinit var tmpData: MutableList<Note>
     private lateinit var noteAdapter: NoteAdapter
     private lateinit var rv: RecyclerView
     private lateinit var alertDialog: AlertDialog.Builder
@@ -53,16 +57,18 @@ class NoteListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_list)
 
+        // handle intent
         userId = intent.getStringExtra("userId").toString()
         val session = client.gotrue.currentSessionOrNull()
 
-        // refresh
+        // onRefresh
         val pullToRefresh = findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         pullToRefresh.setOnRefreshListener {
-            fetchNotes() // your code
+            fetchNotes() // on refresh, re-fetch the notes
             pullToRefresh.isRefreshing = false
         }
 
+        // alert dialog
         alertDialog = AlertDialog.Builder(this)
 
         // set layout manager of recycler view
@@ -76,11 +82,53 @@ class NoteListActivity : AppCompatActivity() {
             manager.orientation);
         rv.addItemDecoration(dividerItemDecoration);
 
+        // onItemTouch
         var helper: ItemTouchHelper = ItemTouchHelper(callback)
         helper.attachToRecyclerView(rv)
 
-        // fetch data from supabase
+        // init data
         fetchNotes()
+
+        // handle search
+        val noteCountText: TextView = findViewById(R.id.noteCount)
+        val sv = findViewById<SearchView>(R.id.searchView)
+        sv.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                TODO("Not yet implemented")
+            }
+
+            // on search query change
+            override fun onQueryTextChange(newText: String?): Boolean {
+                data.clear()
+                val searchText = newText!!.toLowerCase(Locale.getDefault())
+                if (searchText.isNotEmpty()) {
+
+                    tmpData.forEach {
+                        // if the filter matches, add it into the filtered data list
+                        if (it.note_title.toLowerCase().contains(searchText) ||
+                            it.note_location.toLowerCase().contains(searchText) ||
+                            it.note_text.toLowerCase().contains(searchText)
+                            ) {
+                            data.add(it)
+                        }
+                    }
+
+                    rv.adapter!!.notifyDataSetChanged() // notify the changes
+                    noteCountText.text = "${rv.adapter!!.itemCount} notes"
+
+                } else {
+                    // if the text field is empty, fill with the proper data
+                    data.clear()
+                    data.addAll(tmpData)
+                    rv.adapter!!.notifyDataSetChanged() // notify the changes
+                    noteCountText.text = "${rv.adapter!!.itemCount} notes"
+                }
+
+                return false
+            }
+
+        })
+
     }
 
     private fun setAdapterData(){
@@ -106,6 +154,7 @@ class NoteListActivity : AppCompatActivity() {
             val res = client.postgrest["notes"].select(){
                 order(column = "note_title", order = Order.ASCENDING)
             }
+            tmpData =  res.decodeList<Note>().toMutableList()
             data =  res.decodeList<Note>().toMutableList()
             setAdapterData()
         }

@@ -10,34 +10,27 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/noteListTitle"
+        <SearchView
+            android:id="@+id/searchView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:fontFamily="@font/ssp_bold"
-            android:text="All notes"
-            android:textSize="30dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:gravity="center"
-            android:paddingTop="20dp"/>
+            android:layoutDirection="rtl"
+            />
 
-        <TextView
-            android:id="@+id/noteCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0 notes"
-            android:layout_gravity="center"
-            android:layout_marginBottom="10dp"/>
-
-<!--        <ListView-->
+        <!--        <ListView-->
 <!--            android:id="@+id/listView"-->
 <!--            android:layout_width="fill_parent"-->
 <!--            android:layout_height="fill_parent"-->
 <!--            android:layout_marginHorizontal="10dp"-->
 <!--            />-->
+
+        <TextView
+            android:id="@+id/noteCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="10dp"
+            android:text="0 notes" />
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/pullToRefresh"

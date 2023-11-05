@@ -493,7 +493,7 @@ class NoteDetailActivity : AppCompatActivity() {
                 for (i in 0..2) {
                     val text = imageLabels[i].text
                     val confidence = imageLabels[i].confidence
-                    imageLabelText.append("$text : $confidence\n")
+                    imageLabelText.append("$text : $confidence\n\n")
                 }
                 progressDialog.dismiss()
                 note.photo_labels = imageLabelText.text.toString()

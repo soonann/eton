@@ -2,6 +2,7 @@ package com.example.eton.noteDetail
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.PendingIntent
 import android.app.ProgressDialog
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -38,11 +39,15 @@ import com.example.eton.supabase.Note
 import com.example.eton.supabase.Supabase
 import com.example.eton.utils.CustomTextWatcher
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.Geofence
+import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.gms.location.GeofencingClient
+import java.util.ArrayList
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
@@ -88,11 +93,19 @@ class NoteDetailActivity : AppCompatActivity() {
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private lateinit var imageLabeler: ImageLabeler
     private lateinit var progressDialog: ProgressDialog
+    lateinit var geofencingClient: GeofencingClient
+    private val geofenceList = ArrayList<Geofence>()
+    private val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 3 // random unique value
+    private val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 4
+    private val REQUEST_TURN_DEVICE_LOCATION_ON = 5
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_detail)
+
+        //initialize geofencing client
+        geofencingClient = LocationServices.getGeofencingClient(this)
 
         if (!Places.isInitialized()) {
             Places.initialize(this@NoteDetailActivity,
@@ -186,6 +199,7 @@ class NoteDetailActivity : AppCompatActivity() {
                         eq("id", note.id)
                     }
                 }
+                createGeofence(note.lat, note.long, title)
                 saved = true
             } else {
                 if (title.isNotEmpty()) {
@@ -489,6 +503,108 @@ class NoteDetailActivity : AppCompatActivity() {
             }
     }
 
+    /**
+     * Geofencing stuff
+     */
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE ||
+            requestCode == REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE) {
+            if (grantResults.size > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED)){
+                Log.v("onRequestPermissionResult", "hi ")
+            }
+        }
+    }
+    private fun createGeofence(lat: Double, long: Double, id: String) {
+        geofenceList.add(
+            Geofence.Builder()
+                .setRequestId(id)
+                .setCircularRegion(lat, long, 100.toFloat())
+                .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
+                .build()
+        )
+        Log.v("createGeofence", geofenceList.toString())
+        addGeofenceRequest()
+    }
+    private fun getGeofenceRequest(): GeofencingRequest {
+        Log.v("getGeofenceRequest", "in the funxtion")
+        return GeofencingRequest.Builder().apply {
+            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+            addGeofences(geofenceList)
+        }.build()
+    }
+
+    private val geofencePendingIntent: PendingIntent by lazy {
+        val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
+        Log.v("geofencePendingIntent", "in here")
+        PendingIntent.getBroadcast(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+        )
+    }
+    @SuppressLint("MissingPermission")
+    private fun addGeofenceRequest() {
+        if(!this.hasLocationPermission()) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                ),
+                0
+            )
+            Log.v("addGeofenceRequest", "no location permission")
+            throw LocationException("Missing location permission")
+        }
+
+        val locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        if (!isGpsEnabled && !isNetworkEnabled) {
+            throw LocationException("GPS is disabled")
+        }
+        geofencingClient.addGeofences(getGeofenceRequest(), geofencePendingIntent).run {
+            addOnSuccessListener {
+                Toast.makeText(
+                    this@NoteDetailActivity,
+                    "Geofence is added successfully",
+                    Toast.LENGTH_SHORT
+                ).show()
+                Log.v("addGeofenceRequest", "successfully added geofence")
+            }
+            addOnFailureListener {
+                Log.e("addGeofenceRequest", it.localizedMessage.toString())
+                Toast.makeText(this@NoteDetailActivity, it.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    private fun removeGeofence() {
+        geofencingClient.removeGeofences(geofencePendingIntent).run {
+            addOnSuccessListener {
+                Log.v("geofence remove", "success")
+            }
+            addOnFailureListener {
+                Log.e("geofence remove", it.message.toString())
+            }
+        }
+    }
+    fun hasLocationPermission(): Boolean {
+        Log.v("hasLocationPermission", "in function")
+        return ContextCompat.checkSelfPermission(
+            this, android.Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+            this, android.Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
 
     // ---------------- CONST VAR ----------------
     companion object {
@@ -502,4 +618,7 @@ class NoteDetailActivity : AppCompatActivity() {
 //        val intent = Intent(this, CameraView::class.java)
 //        startActivity(intent)
 //    }
+}
+class LocationException(message: String) :Exception(){
+
 }

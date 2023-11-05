@@ -129,17 +129,6 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/conversationBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:src="@drawable/conversation"
-                android:layout_margin="10dp"
-                app:fabSize="normal"
-                android:onClick="onConversation"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
         </LinearLayout>
         <Button
             android:id="@+id/btnSave"
@@ -171,7 +160,7 @@
         android:layout_width="228dp"
         android:layout_height="204dp"
         android:layout_marginBottom="12dp"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextBody"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.108"
         app:layout_constraintStart_toStartOf="parent"

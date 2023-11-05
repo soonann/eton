@@ -31,7 +31,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.example.eton.ConversationActivity
 import com.example.eton.R
 import com.example.eton.utils.GetAddressFromLatLng
 import com.example.eton.map.MapActivity
@@ -92,11 +91,10 @@ class NoteDetailActivity : AppCompatActivity() {
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private lateinit var imageLabeler: ImageLabeler
     private lateinit var progressDialog: ProgressDialog
-    public lateinit var geofencingClient: GeofencingClient
-    public val geofenceList = ArrayList<Geofence>()
+    private lateinit var geofencingClient: GeofencingClient
+    private val geofenceList = ArrayList<Geofence>()
     private val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 3 // random unique value
     private val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 4
-    private val REQUEST_TURN_DEVICE_LOCATION_ON = 5
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -120,7 +118,7 @@ class NoteDetailActivity : AppCompatActivity() {
 
         etTitle = findViewById(R.id.editTextTitle)
         etBody = findViewById(R.id.editTextBody)
-        val textWatcher = CustomTextWatcher()
+        val textWatcher = CustomTextWatcher(this, etBody)
         etBody.addTextChangedListener(textWatcher)
         etLocation = findViewById(R.id.editTextLocation)
         imageView = findViewById(R.id.imageView)
@@ -169,6 +167,8 @@ class NoteDetailActivity : AppCompatActivity() {
 
             // Display the bitmap in the ImageView.
             imageView.setImageBitmap(bitmap)
+
+            setBodySizeToAboveImage()
         }
 
         if (note.photo_labels.isNotEmpty()) {
@@ -244,6 +244,7 @@ class NoteDetailActivity : AppCompatActivity() {
                 photo = data?.extras?.get("data") as Bitmap
                 imageView.setImageBitmap(photo)
                 labelImage(photo!!)
+                setBodySizeToAboveImage()
                 note.note_photo = photo?.let { bitmapToBase64(it) } ?: ""
             } else if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
                 val place: Place = Autocomplete.getPlaceFromIntent(data!!)
@@ -353,11 +354,6 @@ class NoteDetailActivity : AppCompatActivity() {
         }
     }
 
-    fun onConversation(view: View) {
-        val intent = Intent(this, ConversationActivity::class.java)
-        startActivity(intent)
-    }
-
     // ---------------- UTILS ----------------
     /**
      * Convert a Bitmap type into a String
@@ -389,6 +385,12 @@ class NoteDetailActivity : AppCompatActivity() {
         } else {
             imageView.layoutParams = originalLayoutParams
         }
+    }
+
+    private fun setBodySizeToAboveImage() {
+        // To prevent note body from overlapping
+        val layoutParams = etBody.layoutParams as ConstraintLayout.LayoutParams
+        layoutParams.bottomToTop = R.id.imageView
     }
 
     /**
@@ -608,6 +610,7 @@ class NoteDetailActivity : AppCompatActivity() {
 
     // ---------------- CONST VAR ----------------
     companion object {
+
         private const val PLACE_AUTOCOMPLETE_REQUEST_CODE = 1
         private const val CAMERA_REQUEST = 2
         private const val SPEECH_INPUT = 3

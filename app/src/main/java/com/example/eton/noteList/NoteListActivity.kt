@@ -107,7 +107,8 @@ class NoteListActivity : AppCompatActivity() {
                         // if the filter matches, add it into the filtered data list
                         if (it.note_title.toLowerCase().contains(searchText) ||
                             it.note_location.toLowerCase().contains(searchText) ||
-                            it.note_text.toLowerCase().contains(searchText)
+                            it.note_text.toLowerCase().contains(searchText) ||
+                            it.photo_labels.toLowerCase().contains(searchText)
                             ) {
                             data.add(it)
                         }

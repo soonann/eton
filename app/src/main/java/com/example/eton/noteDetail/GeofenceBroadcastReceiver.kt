@@ -13,6 +13,7 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getSystemService
+import com.example.eton.R
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
@@ -22,7 +23,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
     private val TAG = "Broadcast =>"
     private val CHANNEL_ID = "Geofence Channel"
 
-    override fun onReceive(context: Context?, intent: Intent?) {
+    override fun onReceive(context: Context, intent: Intent) {
         Log.v("onReceive in GeofenceBroadcastReceiver", "before anything runs")
         //Added Notification
         val geofencingEvent = intent?.let { GeofencingEvent.fromIntent(it) }
@@ -45,19 +46,12 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
                 Geofence.GEOFENCE_TRANSITION_ENTER -> {
                     //sendNotification(context!!,"Enter")
-                    val title = geofencingEvent.triggeringGeofences!![0].requestId.drop(3)
+                    val title = geofencingEvent.triggeringGeofences!![0].requestId
                     sendNotification(context!!, title)
                 }
 
-                Geofence.GEOFENCE_TRANSITION_DWELL -> {
-                    sendNotification(context!!,"Dwell")
-                }
-
-                Geofence.GEOFENCE_TRANSITION_EXIT -> {
-                    sendNotification(context!!, "Exit")
-                }
                 else -> {
-                    Log.e(TAG, "Error in setting up the geofence")
+                    Log.e(TAG, "not an enter")
                 }
             }
         }
@@ -97,7 +91,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setContentTitle("Eton")
             .setContentText("Reminder: $type")
-            //.setSmallIcon(R.drawable.etonlogo)
+            .setSmallIcon(R.drawable.etonlogo)
             .setAutoCancel(true)
             .setDefaults(Notification.DEFAULT_ALL)
             .setContentIntent(pendingIntent)

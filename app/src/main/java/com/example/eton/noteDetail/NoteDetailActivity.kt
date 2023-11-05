@@ -573,11 +573,11 @@ class NoteDetailActivity : AppCompatActivity() {
         }
         geofencingClient.addGeofences(getGeofenceRequest(), geofencePendingIntent).run {
             addOnSuccessListener {
-                Toast.makeText(
-                    this@NoteDetailActivity,
-                    "Geofence is added successfully",
-                    Toast.LENGTH_SHORT
-                ).show()
+                //Toast.makeText(
+                //    this@NoteDetailActivity,
+               //     "Geofence is added successfully",
+               //     Toast.LENGTH_SHORT
+               // ).show()
                 Log.v("addGeofenceRequest", "successfully added geofence")
             }
             addOnFailureListener {

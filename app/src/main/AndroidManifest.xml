@@ -57,6 +57,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver
+            android:name="com.example.eton.noteDetail.GeofenceBroadcastReceiver"
+            android:exported="true"
+            android:enabled="true"
+            />
     </application>
 
 </manifest>

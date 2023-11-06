@@ -13,7 +13,6 @@ import android.graphics.BitmapFactory
 import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
 import android.provider.MediaStore
@@ -26,27 +25,27 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.eton.R
-import com.example.eton.utils.GetAddressFromLatLng
 import com.example.eton.map.MapActivity
 import com.example.eton.supabase.Note
 import com.example.eton.supabase.Supabase
 import com.example.eton.utils.CustomTextWatcher
+import com.example.eton.utils.GetAddressFromLatLng
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Geofence
+import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
-import com.google.android.gms.location.GeofencingClient
-import java.util.ArrayList
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
@@ -71,6 +70,7 @@ import java.util.Locale
 import java.util.Objects
 import java.util.Random
 import kotlin.properties.Delegates
+
 class NoteDetailActivity : AppCompatActivity() {
     // for new note
     private var added = false
@@ -105,8 +105,10 @@ class NoteDetailActivity : AppCompatActivity() {
         geofencingClient = LocationServices.getGeofencingClient(this)
 
         if (!Places.isInitialized()) {
-            Places.initialize(this@NoteDetailActivity,
-                resources.getString(R.string.google_maps_api_key))
+            Places.initialize(
+                this@NoteDetailActivity,
+                resources.getString(R.string.google_maps_api_key)
+            )
         }
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -179,22 +181,22 @@ class NoteDetailActivity : AppCompatActivity() {
     /**
      * Save/Add note
      */
-    fun onSave(view: View){
+    fun onSave(view: View) {
         var saved = false
         val title = etTitle.text.toString().trim()
         val body = etBody.text.toString().trim()
         try {
             if (added) {
                 lifecycleScope.launch {
-                    client.postgrest["notes"].update ({
-                        set("note_title", title )
+                    client.postgrest["notes"].update({
+                        set("note_title", title)
                         set("note_text", body)
                         set("note_location", note.note_location)
                         set("lat", note.lat)
                         set("long", note.long)
                         set("note_photo", note.note_photo)
                         set("photo_labels", note.photo_labels)
-                    }){
+                    }) {
                         eq("id", note.id)
                     }
                 }
@@ -254,7 +256,8 @@ class NoteDetailActivity : AppCompatActivity() {
                 note.long = place.latLng!!.longitude
             } else if (requestCode == SPEECH_INPUT) {
                 if (data != null) {
-                    val res: ArrayList<String> = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
+                    val res: ArrayList<String> =
+                        data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
                     val tempBody = "${etBody.text} ${Objects.requireNonNull(res)[0]}"
                     etBody.setText(tempBody)
                 }
@@ -284,7 +287,11 @@ class NoteDetailActivity : AppCompatActivity() {
      */
     fun onCameraOpen(view: View) {
         if (!isCameraEnabled()) {
-            Toast.makeText(this, "Your camera permission is turned off. Please turn it on to work!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this,
+                "Your camera permission is turned off. Please turn it on to work!",
+                Toast.LENGTH_SHORT
+            ).show()
         } else {
             val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             startActivityForResult(cameraIntent, CAMERA_REQUEST)
@@ -305,16 +312,20 @@ class NoteDetailActivity : AppCompatActivity() {
      */
     fun onCurrentLocation(view: View) {
         if (!isLocationEnabled()) {
-            Toast.makeText(this, "Your location provider is turned off. Please turn it on to work!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this,
+                "Your location provider is turned off. Please turn it on to work!",
+                Toast.LENGTH_SHORT
+            ).show()
             val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
             startActivity(intent)
         } else {
-            Dexter.withActivity(this).withPermissions(
+            Dexter.withContext(this).withPermissions(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION
-            ).withListener(object: MultiplePermissionsListener {
+            ).withListener(object : MultiplePermissionsListener {
                 override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
-                    if (report!!.areAllPermissionsGranted()){
+                    if (report!!.areAllPermissionsGranted()) {
                         requestNewLocationData()
                     }
                 }
@@ -350,7 +361,11 @@ class NoteDetailActivity : AppCompatActivity() {
         try {
             startActivityForResult(intent, SPEECH_INPUT)
         } catch (e: Exception) {
-            Toast.makeText(this@NoteDetailActivity, "Unable to record:: " + e.message, Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this@NoteDetailActivity,
+                "Unable to record:: " + e.message,
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -397,15 +412,22 @@ class NoteDetailActivity : AppCompatActivity() {
      * Check if location is enabled
      */
     private fun isLocationEnabled(): Boolean {
-        val locationManager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        val locationManager: LocationManager =
+            getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+            LocationManager.NETWORK_PROVIDER
+        )
     }
 
     /**
      * Check if camera is enabled, else request permissions
      */
     private fun isCameraEnabled(): Boolean {
-        return if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+        return if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.CAMERA),
@@ -420,12 +442,17 @@ class NoteDetailActivity : AppCompatActivity() {
 
     @SuppressLint("MissingPermission")
     private fun requestNewLocationData() {
-        var mLocationRequest = LocationRequest()
-        mLocationRequest.priority = Priority.PRIORITY_HIGH_ACCURACY
-        mLocationRequest.interval = 1000
-        mLocationRequest.numUpdates = 1
+        var mLocationRequest = LocationRequest.create().apply {
+            interval = 1000
+            priority = Priority.PRIORITY_HIGH_ACCURACY
+            numUpdates = 5
+        }
 
-        mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallBack, Looper.myLooper())
+        mFusedLocationClient.requestLocationUpdates(
+            mLocationRequest,
+            mLocationCallBack,
+            Looper.myLooper()
+        )
     }
 
     /**
@@ -462,7 +489,7 @@ class NoteDetailActivity : AppCompatActivity() {
             note.long = mLastLocation.longitude
 
             val addressTask = GetAddressFromLatLng(this@NoteDetailActivity, note.lat, note.long)
-            addressTask.setAddressListener(object: GetAddressFromLatLng.AddressListener {
+            addressTask.setAddressListener(object : GetAddressFromLatLng.AddressListener {
                 override fun onAddressFound(address: String?) {
                     etLocation.setText(address)
                     note.note_location = address!!
@@ -488,7 +515,7 @@ class NoteDetailActivity : AppCompatActivity() {
         progressDialog.setMessage("Labelling image...")
 
         imageLabeler.process(inputImage)
-            .addOnSuccessListener {imageLabels ->
+            .addOnSuccessListener { imageLabels ->
                 imageLabelText.text = ""
                 for (i in 0..2) {
                     val text = imageLabels[i].text
@@ -515,12 +542,14 @@ class NoteDetailActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if (requestCode == REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE ||
-            requestCode == REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE) {
-            if (grantResults.size > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED)){
+            requestCode == REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
+        ) {
+            if (grantResults.size > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 Log.v("onRequestPermissionResult", "hi ")
             }
         }
     }
+
     private fun createGeofence(lat: Double, long: Double, id: String) {
         geofenceList.add(
             Geofence.Builder()
@@ -533,6 +562,7 @@ class NoteDetailActivity : AppCompatActivity() {
         Log.v("createGeofence", geofenceList.toString())
         addGeofenceRequest()
     }
+
     private fun getGeofenceRequest(): GeofencingRequest {
         Log.v("getGeofenceRequest", "in the funxtion")
         return GeofencingRequest.Builder().apply {
@@ -551,10 +581,11 @@ class NoteDetailActivity : AppCompatActivity() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
         )
     }
+
     @SuppressLint("MissingPermission")
     private fun addGeofenceRequest() {
         geofencePendingIntent.creatorUid
-        if(!this.hasLocationPermission()) {
+        if (!this.hasLocationPermission()) {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(
@@ -577,9 +608,9 @@ class NoteDetailActivity : AppCompatActivity() {
             addOnSuccessListener {
                 //Toast.makeText(
                 //    this@NoteDetailActivity,
-               //     "Geofence is added successfully",
-               //     Toast.LENGTH_SHORT
-               // ).show()
+                //     "Geofence is added successfully",
+                //     Toast.LENGTH_SHORT
+                // ).show()
                 Log.v("addGeofenceRequest", "successfully added geofence")
             }
             addOnFailureListener {
@@ -588,6 +619,7 @@ class NoteDetailActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun removeGeofence() {
         geofencingClient.removeGeofences(geofencePendingIntent).run {
             addOnSuccessListener {
@@ -598,6 +630,7 @@ class NoteDetailActivity : AppCompatActivity() {
             }
         }
     }
+
     fun hasLocationPermission(): Boolean {
         Log.v("hasLocationPermission", "in function")
         return ContextCompat.checkSelfPermission(
@@ -622,6 +655,7 @@ class NoteDetailActivity : AppCompatActivity() {
 //        startActivity(intent)
 //    }
 }
-class LocationException(message: String) :Exception(){
+
+class LocationException(message: String) : Exception() {
 
 }

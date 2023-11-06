@@ -51,7 +51,6 @@ class NoteListActivity : AppCompatActivity() {
         }
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            Log.i("what am i", data.get(viewHolder.adapterPosition).toString())
             deleteNote(viewHolder.adapterPosition, viewHolder)
         }
     }
@@ -88,7 +87,7 @@ class NoteListActivity : AppCompatActivity() {
         rv.addItemDecoration(dividerItemDecoration);
 
         // onItemTouch
-        var helper: ItemTouchHelper = ItemTouchHelper(callback)
+        var helper = ItemTouchHelper(callback)
         helper.attachToRecyclerView(rv)
 
         // init data

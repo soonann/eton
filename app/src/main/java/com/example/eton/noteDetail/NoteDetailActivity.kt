@@ -14,6 +14,7 @@ import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
@@ -443,16 +444,16 @@ class NoteDetailActivity : AppCompatActivity() {
     @SuppressLint("MissingPermission")
     private fun requestNewLocationData() {
         var mLocationRequest = LocationRequest.create().apply {
-            interval = 1000
+            interval = 0
+            fastestInterval = 1000 // Request location updates every 1000 milliseconds.
             priority = Priority.PRIORITY_HIGH_ACCURACY
-            numUpdates = 5
         }
 
-        mFusedLocationClient.requestLocationUpdates(
-            mLocationRequest,
-            mLocationCallBack,
-            Looper.myLooper()
-        )
+        val handler = Handler(Looper.getMainLooper())
+        val runnable = Runnable {
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallBack, Looper.myLooper())
+        }
+        handler.post(runnable)
     }
 
     /**
@@ -520,7 +521,7 @@ class NoteDetailActivity : AppCompatActivity() {
                 for (i in 0..2) {
                     val text = imageLabels[i].text
                     val confidence = imageLabels[i].confidence
-                    imageLabelText.append("$text : $confidence\n\n")
+                    imageLabelText.append("$text : $confidence\n")
                 }
                 progressDialog.dismiss()
                 note.photo_labels = imageLabelText.text.toString()

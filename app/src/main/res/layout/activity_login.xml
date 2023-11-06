@@ -12,7 +12,7 @@
         android:id="@+id/imageView"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        tools:srcCompat="@drawable/etonLogo"
+        android:src="@drawable/etonlogo"
         android:layout_marginBottom="10dp" />
 
     <TextView

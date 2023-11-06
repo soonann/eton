@@ -37,9 +37,10 @@
             android:focusable="false"
             android:focusableInTouchMode="false"
             android:layout_width="0dp"
-            android:layout_weight="1.2"
+            android:layout_weight="1"
             android:layout_height="match_parent"
             android:fontFamily="@font/ssp_regular"
+            android:textSize="14sp"
             android:onClick="onAddLocation"
             android:hint="Tag a location"
             android:gravity="center"/>
@@ -49,14 +50,22 @@
             android:layout_height="match_parent"
             android:layout_weight="0.1"/>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/currentLocationBtn"
-            android:layout_width="0dp"
-            android:layout_weight="0.9"
-            android:layout_height="match_parent"
-            android:onClick="onCurrentLocation"
-            android:text="Current location"
-            android:fontFamily="@font/ssp_bold"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:icon="@drawable/near_me"
+            style="?attr/materialIconButtonFilledStyle"
+            android:onClick="onCurrentLocation"/>
+<!--        <Button-->
+<!--            android:id="@+id/currentLocationBtn2"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_weight="0.8"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:onClick="onCurrentLocation"-->
+<!--            android:text="Current location"-->
+<!--            android:textSize="13sp"-->
+<!--            android:fontFamily="@font/ssp_bold"/>-->
     </LinearLayout>
 
     <EditText

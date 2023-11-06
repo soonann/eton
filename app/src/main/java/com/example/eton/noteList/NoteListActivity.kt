@@ -104,7 +104,9 @@ class NoteListActivity : AppCompatActivity() {
 
             // on search query change
             override fun onQueryTextChange(newText: String?): Boolean {
-                data.clear()
+                if (data != null) {
+                    data.clear()
+                }
                 val searchText = newText!!.toLowerCase(Locale.getDefault())
                 if (searchText.isNotEmpty()) {
 

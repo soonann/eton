@@ -7,6 +7,6 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
-    <string name="google_maps_api_key">CHATGPT_TOKEN_HERE</string>
-    <string name="gpt_key">CHATGPT_TOKEN_HERE</string>
+    <string name="google_maps_api_key">YOUR KEY HERE</string>
+    <string name="gpt_key">YOUR KEY HERE</string>
 </resources>

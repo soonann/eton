@@ -10,8 +10,8 @@ class Supabase {
     companion object {
         fun getClient(): SupabaseClient {
             return createSupabaseClient(
-                supabaseUrl = "SUPABASE_URL_HERE",
-                supabaseKey = "SUPABASE_ANON_TOKEN_HERE",
+                supabaseUrl = "<YOUR KEY HERE>",
+                supabaseKey = "<YOUR KEY HERE>",
             ) {
                 install(Postgrest)
                 install(GoTrue)
